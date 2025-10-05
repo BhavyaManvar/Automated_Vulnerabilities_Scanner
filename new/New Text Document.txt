@@ -1,0 +1,118 @@
+I'll scan the Go web demo for handlers, template rendering, redirects, and input usage; in parallel I'll search the repo for potential sinks like redirects, template execution, SSRF calls, and unsafe exec. Then I'll open key files like `handlers.go`, `web.go`, and templates to confirm XSS/CSRF and auth patterns.
+
+[5 tools called]
+
+I found the Echo web server and template usage. Now I'll open `web.go`, `handlers.go`, and key HTML templates to inspect input handling, redirects, and innerHTML usage.
+
+[17 tools called]
+
+[
+  {
+    "title": "State-changing operations exposed via GET without CSRF protection and permissive CORS",
+    "severity": "High",
+    "location": "demos-go/cmd/threshold-ecdsa-web/web.go: lines 237-245, 344-392, 645-736",
+    "description": "Multiple endpoints that change server state and execute cryptographic workflows are implemented as GET and lack CSRF protections. Additionally, a global CORS middleware allows any origin and all headers, enabling any website to trigger these actions from a victim's browser. This combination allows cross-site drive-by requests to initiate DKG/signing operations.",
+    "trigger": "A victim with the demo web UI open visits any attacker-controlled site which issues cross-origin GET requests to the service.",
+    "poc": "GET http://127.0.0.1:7080/api/dkg/execute?threshold=2\nGET http://127.0.0.1:7080/api/sign/execute?threshold=2&message=hello&parties=1\n\nHTML drive-by example:\n<img src=\"http://127.0.0.1:7080/api/dkg/execute?threshold=2\">",
+    "impact": "Attacker can trigger expensive DKG/signing operations in the background (DoS, resource exhaustion), alter local coordination state, and potentially interfere with demo workflows without user intent.",
+    "fix": "- Require POST for state-changing endpoints and reject GET for such actions.\n- Add CSRF protection (synchronizer token or double-submit cookie) for POST/PUT/DELETE.\n- Restrict CORS: set Access-Control-Allow-Origin to a trusted origin (or disable entirely), specify allowed methods/headers, and consider SameSite=strict cookies if any authentication is added.\n- Add explicit content-type checks (e.g., require application/x-www-form-urlencoded or application/json).",
+    "confidence": "High",
+    "quick_mitigation": "Temporarily disable CORS wildcard and block cross-origin requests; switch endpoints to POST and enforce a CSRF token check at the handler."
+  },
+  {
+    "title": "Missing authentication/authorization on sensitive API routes",
+    "severity": "High",
+    "location": "demos-go/cmd/threshold-ecdsa-web/web.go: lines 276-340, 344-392, 396-456, 460-511, 516-608, 610-641, 645-736",
+    "description": "All HTTP routes are unauthenticated. The code checks `runConfig.MyIndex` server-side but does not verify the caller identity. Any local client (or remote if bound/forwarded) can invoke endpoints that are meant for Party 0 or other parties, including initiating DKG or signing.",
+    "trigger": "Attacker can send HTTP requests directly to the service ports (e.g., 7080/7081/... per config).",
+    "poc": "curl http://127.0.0.1:7081/api/dkg/auto-execute?threshold=2\ncurl http://127.0.0.1:7080/api/sign/execute?threshold=2&message=hello&parties=1",
+    "impact": "Unauthorized control of DKG/sign processes, information disclosure, and manipulation of the demo state.",
+    "fix": "- Add authentication (e.g., mutual TLS for the web API or signed session tokens).\n- Introduce per-request authorization checks tied to the authenticated identity, not just local `runConfig.MyIndex`.\n- Bind only to localhost and guard ports with firewall rules.",
+    "confidence": "High",
+    "quick_mitigation": "Restrict network access to localhost; protect ports via firewall; run behind a reverse proxy that enforces basic auth or mTLS."
+  },
+  {
+    "title": "Information leakage of signing parameters to unauthenticated clients",
+    "severity": "Medium",
+    "location": "demos-go/cmd/threshold-ecdsa-web/web.go: lines 610-641 (/api/sign/poll)",
+    "description": "The polling endpoint returns sensitive signing parameters (threshold, selectedParties, message) without authentication.",
+    "trigger": "Any client calls /api/sign/poll on Party 0.",
+    "poc": "curl http://127.0.0.1:7080/api/sign/poll?party=2\nResponse includes: { \"initiated\": true, \"threshold\": 3, \"selectedParties\": [0,2,3], \"message\": \"...\" }",
+    "impact": "Attacker learns chosen participants and the message to be signed, which may be sensitive in some contexts.",
+    "fix": "- Require authentication and only return data authorized for the requesting party.\n- Minimize response data and omit the message unless strictly needed.",
+    "confidence": "High",
+    "quick_mitigation": "Temporarily redact the message and selected party list from responses and restrict access to localhost."
+  },
+  {
+    "title": "DOM XSS risk via unsafe innerHTML concatenation of error messages",
+    "severity": "Medium",
+    "location": "demos-go/cmd/threshold-ecdsa-web/templates/dkg_connection_waiting.html: lines 108-121; signing_leader_interface.html: lines 227-233; signing_immediate_waiting.html: lines 165-183 and 216-223",
+    "description": "Client-side scripts construct HTML strings by concatenating `error.message` and inject them via `innerHTML`. While the server template output is escaped, exception messages can include attacker-controlled content (e.g., if an attacker influences URL or network error text), leading to DOM-based XSS if HTML is interpreted.",
+    "trigger": "Cause fetch to fail with a crafted message (e.g., intercepting or manipulating network errors, or pointing to an attacker-controlled endpoint that causes specific error text containing HTML/JS).",
+    "poc": "Modify `party0BaseUrl` to a value that causes a network error with HTML content in the message and observe execution after it is set via `innerHTML`.",
+    "impact": "Arbitrary script execution in the user's browser within the demo origin, potentially exfiltrating data or altering UI flows.",
+    "fix": "- Do not use `innerHTML` for error messages; set text content via `textContent`.\n- If HTML is necessary, sanitize using a robust sanitizer (DOMPurify) before assigning to `innerHTML`.\n- Ensure error messages are rendered as text-only.",
+    "confidence": "Medium",
+    "quick_mitigation": "Wrap error messages with `textContent` assignments or sanitize with DOMPurify before injection."
+  },
+  {
+    "title": "Potential file write/read path traversal via partyName in key share filenames",
+    "severity": "Medium",
+    "location": "demos-go/cmd/threshold-ecdsa-web/handlers.go: lines 192-201 (saveKeyShare), 234-246 (loadKeyShare)",
+    "description": "Filenames are constructed with `fmt.Sprintf(\"keyshare_party_%s.json\", partyName)` where `partyName` is derived from the certificate subject. If certificates are untrusted or attacker-controlled, embedded `../` or path separators could cause writes/reads outside the intended directory.",
+    "trigger": "An attacker supplies or replaces a certificate whose subject-derived party name includes path traversal sequences.",
+    "poc": "If `partyName` == `../../.ssh/authorized_keys`, writing will target `keyshare_party_../../.ssh/authorized_keys.json` which may be normalized by tooling or later mishandled; on some systems, path separator injection (e.g., with unicode variants) could reach unexpected targets.",
+    "impact": "Overwriting or reading arbitrary files relative to the working directory; potential local privilege escalation depending on environment and file ACLs.",
+    "fix": "- Sanitize `partyName`: reject any path separator characters, control characters, or `..` sequences; enforce a strict allowlist (e.g., `^[A-Za-z0-9_-]+$`).\n- Use `filepath.Base` and a dedicated storage directory with `O_NOFOLLOW` safeguards where possible.",
+    "confidence": "Medium",
+    "quick_mitigation": "Validate and normalize `partyName` against a strict regex before file operations; store files in a fixed, locked-down directory."
+  },
+  {
+    "title": "Overly permissive CORS configuration allows any origin and headers",
+    "severity": "Medium",
+    "location": "demos-go/cmd/threshold-ecdsa-web/web.go: lines 237-245",
+    "description": "CORS is configured to allow all origins, methods, and headers. Combined with unauthenticated GET state changes, this enables cross-origin sites to interact freely with the API.",
+    "trigger": "Any website can issue cross-origin requests to the service.",
+    "poc": "JavaScript from `https://attacker.example` fetches `http://127.0.0.1:7080/api/dkg/execute?threshold=2` and the browser accepts due to `Access-Control-Allow-Origin: *`.",
+    "impact": "Cross-site request capability for any origin; increases likelihood and ease of CSRF/drive-by attacks.",
+    "fix": "- Restrict `Access-Control-Allow-Origin` to a specific trusted origin.\n- Limit allowed methods/headers and avoid `*`.\n- Consider disabling CORS entirely if not needed across origins.",
+    "confidence": "High",
+    "quick_mitigation": "Set `Access-Control-Allow-Origin` to the exact UI origin and remove `Allow-Headers: *`."
+  },
+  {
+    "title": "External CDN assets without integrity on critical CSS/JS",
+    "severity": "Low",
+    "location": "demos-go/cmd/threshold-ecdsa-web/templates/dkg_base.html: lines 5-7; signing_leader_interface.html: lines 5-7; signing_immediate_waiting.html: lines 5-7",
+    "description": "Bulma and Font Awesome are loaded from CDNs without Subresource Integrity (SRI). A CDN compromise or network attacker could inject malicious content. HTMX script has an integrity attribute, but others do not.",
+    "trigger": "User loads the page; CDN or network is compromised/mitm.",
+    "poc": "Replace CDN response with malicious CSS/JS to execute arbitrary code on the page.",
+    "impact": "Potential XSS and UI manipulation via third-party content.",
+    "fix": "- Add SRI hashes and `crossorigin` attributes for all third-party assets.\n- Prefer self-hosting assets for demos handling cryptographic workflows.",
+    "confidence": "High",
+    "quick_mitigation": "Temporarily self-host CSS/JS or add SRI hashes."
+  },
+  {
+    "title": "Insecure default: HTTP without TLS for web API",
+    "severity": "Low",
+    "location": "demos-go/cmd/threshold-ecdsa-web/web.go: lines 739-741; configs under demos-go/cmd/threshold-ecdsa-web/config-*.yaml",
+    "description": "The web server listens on plain HTTP (127.0.0.1:708x). Although local-only by default, if exposed or forwarded, traffic is unencrypted and modifiable in transit.",
+    "trigger": "Service bound or forwarded to a non-local interface, or user runs on shared/remote hosts.",
+    "poc": "Traffic sniffing/alteration on localhost proxies or when port-forwarded over insecure channels.",
+    "impact": "Potential information leakage and request tampering.",
+    "fix": "- Bind strictly to localhost for demos and document it.\n- If exposure is needed, terminate TLS (self-signed or mTLS) at the server or a reverse proxy.",
+    "confidence": "High",
+    "quick_mitigation": "Ensure binding only to 127.0.0.1 and block external access via firewall."
+  },
+  {
+    "title": "Outdated Echo version may include known issues",
+    "severity": "Low",
+    "location": "demos-go/cmd/threshold-ecdsa-web/go.mod: line 9",
+    "description": "The project uses `github.com/labstack/echo/v4 v4.13.4`, which is older. While no specific CVE is confirmed here, older framework versions can include known vulnerabilities.",
+    "trigger": "N/A (dependency version choice).",
+    "poc": "N/A",
+    "impact": "Potential exposure to known framework bugs (routing, header handling, etc.).",
+    "fix": "- Upgrade Echo to the latest v4.x version and review changelog for security fixes.\n- Run `go list -m -u all` and a vulnerability scanner (`govulncheck`).",
+    "confidence": "Low",
+    "quick_mitigation": "Run `govulncheck` and bump `echo` to the latest minor."
+  }
+]
